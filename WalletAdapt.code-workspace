@@ -1,0 +1,23 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "../../../Downloads/movie_review_app_v02-main/app"
+		},
+		{
+			"path": "../../../Downloads/movie_review_app_v02-main/components"
+		},
+		{
+			"path": "../../../Downloads/movie_review_app_v02-main/lib"
+		},
+		{
+			"path": "../../../Downloads/movie_review_app_v02-main/providers"
+		},
+		{
+			"path": "../../../Downloads/movie_review_app_v02-main/public"
+		}
+	],
+	"settings": {}
+}
