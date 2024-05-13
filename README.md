@@ -1,36 +1,78 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Basic Wallet Adapter with React
 
-## Getting Started
+Quick set up React App
 
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+npx create-solana-dapp <app-name>
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Full setup manually:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm install --save \
+    @solana/wallet-adapter-base \
+    @solana/wallet-adapter-react \
+    @solana/wallet-adapter-react-ui \
+    @solana/wallet-adapter-wallets \
+    @solana/web3.js \
+    react
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+The `WalletProvider` can than be setup to connect to a user's wallet and later send transaction
 
-## Learn More
+```
+import React, { FC, useMemo } from 'react';
+import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
+import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
+import { UnsafeBurnerWalletAdapter } from '@solana/wallet-adapter-wallets';
+import {
+    WalletModalProvider,
+    WalletDisconnectButton,
+    WalletMultiButton
+} from '@solana/wallet-adapter-react-ui';
+import { clusterApiUrl } from '@solana/web3.js';
+ 
+// Default styles that can be overridden by your app
+require('@solana/wallet-adapter-react-ui/styles.css');
+ 
+export const Wallet: FC = () => {
+    // The network can be set to 'devnet', 'testnet', or 'mainnet-beta'.
+    const network = WalletAdapterNetwork.Devnet;
+ 
+    // You can also provide a custom RPC endpoint.
+    const endpoint = useMemo(() => clusterApiUrl(network), [network]);
+ 
+    const wallets = useMemo(
+        () => [
+            /**
+             * Wallets that implement either of these standards will be available automatically.
+             *
+             *   - Solana Mobile Stack Mobile Wallet Adapter Protocol
+             *     (https://github.com/solana-mobile/mobile-wallet-adapter)
+             *   - Solana Wallet Standard
+             *     (https://github.com/anza-xyz/wallet-standard)
+             *
+             * If you wish to support a wallet that supports neither of those standards,
+             * instantiate its legacy wallet adapter here. Common legacy adapters can be found
+             * in the npm package `@solana/wallet-adapter-wallets`.
+             */
+            new UnsafeBurnerWalletAdapter(),
+        ],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [network]
+    );
+ 
+    return (
+        <ConnectionProvider endpoint={endpoint}>
+            <WalletProvider wallets={wallets} autoConnect>
+                <WalletModalProvider>
+                    <WalletMultiButton />
+                    <WalletDisconnectButton />
+                    { /* Your app's components go here, nested within the context providers. */ }
+                </WalletModalProvider>
+            </WalletProvider>
+        </ConnectionProvider>
+    );
+};
+```
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
